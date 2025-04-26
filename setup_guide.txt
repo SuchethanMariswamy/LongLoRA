@@ -1,0 +1,83 @@
+
+Dependencies and Setup Guide
+
+Environment Requirements:
+- Python version 3.8 or higher
+- CUDA-enabled GPU (optional but recommended for faster training)
+
+Required Python Packages:
+- transformers version 4.33.2 or higher
+- datasets version 2.12.0 or higher
+- peft version 0.3.0 or higher
+- torch version 2.0.0 or higher
+- accelerate version 0.20.0 or higher
+- flash-attn
+
+Note:
+- Flash Attention (flash-attn) is optional but improves training speed.
+- If flash-attn installation fails, training can proceed without it by disabling Flash Attention (--use_flash_attn false).
+
+Setup Instructions:
+
+1. Clone the Repository:
+
+git clone https://github.com/yourusername/longlora-finetune.git
+cd longlora-finetune
+
+2. Create a Virtual Environment (recommended):
+
+python3 -m venv venv
+source venv/bin/activate
+
+3. Install the Required Packages:
+
+pip install -r requirements.txt
+
+If needed, install flash-attn separately:
+
+pip install flash-attn --no-build-isolation
+
+4. Prepare the Dataset:
+
+- Create a folder named data/.
+- Save the training file as longalpaca.json inside the data/ folder.
+- Dataset format should be a JSON array of objects containing instruction, input, and output fields.
+
+Example longalpaca.json:
+
+[
+  {
+    "instruction": "Translate English to French",
+    "input": "Good morning",
+    "output": "Bonjour"
+  },
+  {
+    "instruction": "Summarize the text",
+    "input": "Large Language Models are very powerful...",
+    "output": "LLMs are powerful AI tools."
+  }
+]
+
+5. Training the Model:
+
+Run the following command to start training:
+
+python train_longlora.py   --model_name_or_path TinyLLaMA/TinyLLaMA-1.1B-Chat-v1.0   --data_path ./data/longalpaca.json   --output_dir ./output/finetuned_model   --per_device_train_batch_size 4   --gradient_accumulation_steps 1   --num_train_epochs 1   --learning_rate 2e-4   --fp16 True   --logging_steps 10   --save_steps 500   --save_total_limit 2
+
+6. Troubleshooting:
+
+- If flash-attn installation fails, disable it using --use_flash_attn false.
+- If CUDA out-of-memory error occurs, reduce batch size or sequence length.
+- Use a clean virtual environment to avoid package conflicts.
+
+Folder Structure:
+
+longlora-finetune/
+├── train_longlora.py
+├── requirements.txt
+├── README.md
+├── data/
+│   └── longalpaca.json
+├── output/
+│   └── finetuned_model/ (after training)
+└── inference_test.py (optional for testing)
